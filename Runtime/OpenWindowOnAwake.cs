@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     public class OpenWindowOnAwake : MonoBehaviour
     {

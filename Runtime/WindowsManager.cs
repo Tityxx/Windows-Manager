@@ -1,78 +1,60 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
-    /// <summary>
-    /// Source: https://gitlab.com/syhodyb99/tools-and-mechanics
-    /// Контроллер окон
-    /// </summary>
     public class WindowsManager : IWindowsManager
     {
+        public event Action<WindowData> onWindowOpened = delegate { };
+        public event Action<WindowData> onWindowClosed = delegate { };
+
         private IInstantiator _instantiator;
+        private Transform _windowsContainer;
 
         private Dictionary<WindowData, Window> _windowsDictionary = new Dictionary<WindowData, Window>();
+        private HashSet<Window> _openedWindows = new HashSet<Window>();
+        private Window _lastClosedWindow;
 
-        private List<Window> _windowsList = new List<Window>();
-        private Window _currentWindow => _windowsList.LastOrDefault(w => w.gameObject.activeSelf);
-        private Canvas _canvas;
-        private Transform _windowsContainer;
-        private bool _inited;
+        private Window _currentWindow => _openedWindows.Last();
 
-        public void Setup(IInstantiator instantiator, Canvas canvas)
+        [Inject]
+        private void Construct(IInstantiator instantiator, Transform windowsContainer)
         {
             _instantiator = instantiator;
-            _canvas = canvas;
+            _windowsContainer = windowsContainer;
         }
 
-        private void Init()
+        public Window OpenWindow(WindowData data, bool closeLastWindow)
         {
-            if (_canvas) _canvas = _instantiator.InstantiatePrefabForComponent<Canvas>(_canvas);
-            else _windowsContainer = new GameObject("Windows Container").transform;
-            _inited = true;
-        }
-
-        public void OpenWindow(WindowData data, bool closeCurrentWindow)
-        {
-            if (!_inited) Init();
-
-            if (_windowsDictionary.TryGetValue(data, out Window window))
-            {
-                if (closeCurrentWindow && _windowsList.Count > 0 && _currentWindow)
-                {
-                    _currentWindow.Close(window.Open);
-                }
-                else
-                {
-                    window.Open();
-                }
-            }
-            else
+            if (!_windowsDictionary.TryGetValue(data, out Window window))
             {
                 CreateWindow(data);
-                OpenWindow(data, closeCurrentWindow);
+                return OpenWindow(data, closeLastWindow);
             }
+            if (closeLastWindow && _openedWindows.Count > 0 && _currentWindow)
+                _currentWindow.Close(window.Open);
+            else
+                window.Open();
+
+            return window;
         }
 
-        public void OpenPreviousWindow(bool closeLastWindow = true)
+        public Window OpenPreviousWindow(bool closeLastWindow)
         {
-            if (!_inited) Init();
-
-            if (_windowsList.Count > 1)
-            {
-                OpenWindow(_windowsList[^2].Data, closeLastWindow);
-            }
+            if (_lastClosedWindow == null)
+                return null;
+            return OpenWindow(_lastClosedWindow.Data, closeLastWindow);
         }
 
         public void CloseWindow(WindowData data)
         {
-            if (!_inited) Init();
-
             if (_windowsDictionary.TryGetValue(data, out Window window))
             {
+                _lastClosedWindow = window;
                 window.Close();
             }
             else
@@ -81,7 +63,7 @@ namespace Tityx.UserInterfaceManager
             }
         }
 
-        public void CloseWindows(List<WindowData> windows)
+        public void CloseWindows(IEnumerable<WindowData> windows)
         {
             foreach (var w in windows)
             {
@@ -91,9 +73,9 @@ namespace Tityx.UserInterfaceManager
 
         public void CloseAllWindows()
         {
-            for (int i = _windowsList.Count - 1; i >= 0; i--)
+            for (int i = _openedWindows.Count - 1; i >= 0; i--)
             {
-                CloseWindow(_windowsList[i].Data);
+                CloseWindow(_openedWindows.ElementAt(i).Data);
             }
         }
 
@@ -102,25 +84,27 @@ namespace Tityx.UserInterfaceManager
             return _windowsDictionary.TryGetValue(data, out window);
         }
 
+        public Window GetWindowByData(WindowData data)
+        {
+            return _windowsDictionary[data];
+        }
+
         public void AddWindowToList(Window window)
         {
-            if (_windowsList.Contains(window))
-            {
-                _windowsList.Remove(window);
-            }
-            _windowsList.Add(window);
+            if (_openedWindows.Contains(window))
+                _openedWindows.Remove(window);
+
+            _openedWindows.Add(window);
         }
 
         public void RemoveWindowFromList(Window window)
         {
-            _windowsList.Remove(window);
+            _openedWindows.Remove(window);
         }
 
         private void CreateWindow(WindowData data)
         {
-            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _canvas ? _canvas.transform : _windowsContainer);
-            window.Data = data;
-            window.gameObject.name = data.name;
+            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _windowsContainer, new object[] { this, data });
             _windowsDictionary.Add(data, window);
         }
     }

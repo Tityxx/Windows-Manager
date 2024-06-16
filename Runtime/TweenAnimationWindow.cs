@@ -5,11 +5,11 @@ using System.Linq;
 using Tityx.Tweens;
 using UnityEngine;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     /// <summary>
-    /// Реализация интерфейса для анимаций
-    /// закрытия/открытия окон через твины
+    /// Implementation of an interface for animations of 
+    /// closing/opening windows using twins
     /// </summary>
     public class TweenAnimationWindow : MonoBehaviour, IWindowAnimation
     {

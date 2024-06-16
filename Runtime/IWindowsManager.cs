@@ -1,62 +1,66 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     public interface IWindowsManager
     {
-        /// <summary>
-        /// Прокидывание ссылок для инициализации
-        /// </summary>
-        /// <param name="canvas"> Канвас, на котором будут окна </param>
-        public void Setup(IInstantiator instantiator, Canvas canvas);
+        public event Action<WindowData> onWindowOpened;
+        public event Action<WindowData> onWindowClosed;
 
         /// <summary>
-        /// Открыть выбранное окно
+        /// Open window
         /// </summary>
-        /// <param name="data">Дата окна</param>
-        /// <param name="closeLastWindow"> Нужно ли закрывать предыдущее окно </param>
-        public void OpenWindow(WindowData data, bool closeLastWindow);
+        /// <param name="data">Window config</param>
+        /// <param name="closeLastWindow">Should close the previous window?</param>
+        public Window OpenWindow(WindowData data, bool closeLastWindow);
 
         /// <summary>
-        /// Открыть предыдущее окно
+        /// Open the previous window
         /// </summary>
-        /// <param name="closeLastWindow"> Нужно ли закрывать выбранное окно </param>
-        public void OpenPreviousWindow(bool closeLastWindow = true);
+        /// <param name="closeLastWindow">Should close the previous window?</param>
+        public Window OpenPreviousWindow(bool closeLastWindow = true);
 
         /// <summary>
-        /// Закрыть выбранное окно
+        /// Close window
         /// </summary>
-        /// <param name="data">Дата окна</param>
+        /// <param name="data">Window config</param>
         public void CloseWindow(WindowData data);
 
         /// <summary>
-        /// Закрыть выбранные окна
+        /// Close windows
         /// </summary>
-        /// <param name="data">Окна</param>
-        public void CloseWindows(List<WindowData> windows);
+        /// <param name="data">Window configs</param>
+        public void CloseWindows(IEnumerable<WindowData> windows);
 
         /// <summary>
-        /// Закрыть активные окна
+        /// Close opened windows
         /// </summary>
         public void CloseAllWindows();
 
         /// <summary>
-        /// Получить префаб окна по дате
+        /// Get window by config
         /// </summary>
-        /// <param name="data">Дата окна</param>
+        /// <param name="data">Window config</param>
+        /// <param name="window">Window</param>
+        /// <returns>true if not null</returns>
         public bool TryGetWindowByData(WindowData data, out Window window);
 
         /// <summary>
-        /// Добавить окно в список открытых окон
+        /// Get window by config
         /// </summary>
-        /// <param name="window"> Окно </param>
+        /// <param name="data">Window config</param>
+        /// <returns>Window</returns>
+        public Window GetWindowByData(WindowData data);
+
+        /// <summary>
+        /// Add a window to the list of open windows
+        /// </summary>
+        /// <param name="window">Window</param>
         public void AddWindowToList(Window window);
 
         /// <summary>
-        /// Удалить окно из списка открытых окон
+        /// Remove a window to the list of open windows
         /// </summary>
         /// <param name="window"> Окно </param>
         public void RemoveWindowFromList(Window window);

@@ -4,67 +4,62 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
-    /// <summary>
-    /// Префаб окна
-    /// </summary>
     public class Window : MonoBehaviour
     {
-        [HideInInspector] public WindowData Data { get; internal set; }
-
-        public bool IsOpen { get; protected set; }
-        public virtual bool IsActive => gameObject.activeSelf;
-
-        [Inject] protected IWindowsManager _windowsManager;
-
+        protected IWindowsManager _windowsManager;
+        protected WindowData _data;
         protected IWindowAnimation _anim;
+        protected bool _isOpen;
+
         protected Action _actionOnClose;
+
+        public WindowData Data => _data;
+
+        [Inject]
+        private void Construct(IWindowsManager windowsManager, WindowData data)
+        {
+            _windowsManager = windowsManager;
+            _data = data;
+            gameObject.name = data.name;
+        }
 
         protected virtual void Awake()
         {
             _anim = GetComponent<IWindowAnimation>();
         }
 
-        /// <summary>
-        /// Открыть окно
-        /// </summary>
-        internal virtual void Open()
+        public virtual void Open()
         {
-            if (IsOpen)
+            if (_isOpen)
                 return;
 
+            _isOpen = true;
             gameObject.SetActive(true);
-            IsOpen = true;
             _windowsManager.AddWindowToList(this);
             OpenInner();
         }
 
-        /// <summary>
-        /// Закрыть окно
-        /// </summary>
-        internal virtual void Close(Action action = null)
+        public virtual void Close(Action action = null)
         {
-            if (!IsOpen)
+            if (!_isOpen)
                 return;
 
-            IsOpen = false;
+            _isOpen = false;
             _actionOnClose = action;
 
             if (_anim != null)
-            {
                 _anim.Close(CloseInner);
-            }
             else
-            {
                 CloseInner();
-            }
         }
 
         protected virtual void OpenInner() { }
 
         protected virtual void CloseInner()
         {
+            _windowsManager.RemoveWindowFromList(this);
             gameObject.SetActive(false);
             _actionOnClose?.Invoke();
         }
