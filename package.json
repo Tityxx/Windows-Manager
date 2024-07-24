@@ -13,7 +13,7 @@
     "url": "https://github.com/Tityxx"
   },
   "dependencies": {
-    "com.tityx.utilities": "",
-    "com.tityx.tweens": ""
+    "com.tityx.utilities": "1.0.2",
+    "com.tityx.tweens": "1.0.1"
   }
 }
