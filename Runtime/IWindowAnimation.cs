@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     /// <summary>
-    /// Интерфейс для анимации открытия/закрытия окон
+    /// Interface for animation of opening/closing windows
     /// </summary>
     public interface IWindowAnimation
     {
         /// <summary>
-        /// Открытие окна
+        /// Window opening
         /// </summary>
         public void Open();
 
         /// <summary>
-        /// Закрытие окна
+        /// Window closing
         /// </summary>
         public void Close(Action action);
     }

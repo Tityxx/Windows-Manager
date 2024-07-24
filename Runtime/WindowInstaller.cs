@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
-    /// <summary>
-    /// Инсталлер для окна. Используется в GameObjectContext
-    /// </summary>
     [RequireComponent(typeof(Window))]
     public class WindowInstaller : MonoInstaller
     {

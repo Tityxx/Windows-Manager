@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     /// <summary>
     /// Данные об окне
     /// </summary>
-    [CreateAssetMenu(menuName = "ToolsAndMechanics/Windows Manager/Window Data", fileName = "New Window")]
+    [CreateAssetMenu(menuName = "Tityx/Windows Manager/Window Data", fileName = "New Window")]
     public class WindowData : ScriptableObject
     {
         public Window WindowPrefab => _windowPrefab;

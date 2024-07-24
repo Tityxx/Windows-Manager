@@ -2,7 +2,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace Tityx.UserInterfaceManager
+namespace Tityx.WindowsManagerSystem
 {
     using Utilities.UI;
 
