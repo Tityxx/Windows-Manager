@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -12,20 +11,21 @@ namespace Tityx.WindowsManagerSystem
         public event Action<WindowData> onWindowOpened = delegate { };
         public event Action<WindowData> onWindowClosed = delegate { };
 
-        private IInstantiator _instantiator;
-        private Transform _windowsContainer;
+        private readonly IInstantiator _instantiator;
+        private readonly Transform _windowsContainer;
+        private readonly Dictionary<WindowData, Window> _windowsDictionary;
+        private readonly HashSet<Window> _openedWindows;
 
-        private Dictionary<WindowData, Window> _windowsDictionary = new Dictionary<WindowData, Window>();
-        private HashSet<Window> _openedWindows = new HashSet<Window>();
         private Window _lastClosedWindow;
 
         private Window _currentWindow => _openedWindows.Last();
 
-        [Inject]
-        private void Construct(IInstantiator instantiator, Transform windowsContainer)
+        public WindowsManager(IInstantiator instantiator, Transform windowsContainer)
         {
             _instantiator = instantiator;
             _windowsContainer = windowsContainer;
+            _windowsDictionary = new();
+            _openedWindows = new();
         }
 
         public Window OpenWindow(WindowData data, bool closeLastWindow)
@@ -59,7 +59,7 @@ namespace Tityx.WindowsManagerSystem
             }
             else
             {
-                Debug.LogError($"Окно с именем '{data.name}' не найдено");
+                Debug.LogError($"Window with name '{data.name}' not found!");
             }
         }
 
@@ -91,9 +91,6 @@ namespace Tityx.WindowsManagerSystem
 
         public void AddWindowToList(Window window)
         {
-            if (_openedWindows.Contains(window))
-                _openedWindows.Remove(window);
-
             _openedWindows.Add(window);
         }
 
@@ -104,7 +101,8 @@ namespace Tityx.WindowsManagerSystem
 
         private void CreateWindow(WindowData data)
         {
-            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _windowsContainer, new object[] { this, data });
+            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _windowsContainer,
+                new object[] {this, data});
             _windowsDictionary.Add(data, window);
         }
     }

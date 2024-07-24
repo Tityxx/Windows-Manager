@@ -62,7 +62,7 @@ namespace Tityx.WindowsManagerSystem
         /// <summary>
         /// Remove a window to the list of open windows
         /// </summary>
-        /// <param name="window"> Окно </param>
+        /// <param name="window"> Window </param>
         public void RemoveWindowFromList(Window window);
     }
 }
