@@ -17,8 +17,7 @@ namespace Tityx.WindowsManagerSystem
 
         public WindowData Data => _data;
 
-        [Inject]
-        private void Construct(IWindowsManager windowsManager, WindowData data)
+        public void Construct(IWindowsManager windowsManager, WindowData data)
         {
             _windowsManager = windowsManager;
             _data = data;
