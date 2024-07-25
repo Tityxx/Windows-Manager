@@ -101,8 +101,8 @@ namespace Tityx.WindowsManagerSystem
 
         private void CreateWindow(WindowData data)
         {
-            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _windowsContainer,
-                new object[] {this, data});
+            Window window = _instantiator.InstantiatePrefabForComponent<Window>(data.WindowPrefab, _windowsContainer);
+            window.Construct(this, data);
             _windowsDictionary.Add(data, window);
         }
     }
